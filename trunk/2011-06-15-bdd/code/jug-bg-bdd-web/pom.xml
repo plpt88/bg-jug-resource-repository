@@ -1,0 +1,142 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.jug.bg.bdd</groupId>
+	<artifactId>web</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>JUG BG - BDD - Use Case Web</name>
+
+	<properties>
+		<war.file.name>BmiCalcWeb</war.file.name>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jbehave.version>3.4</jbehave.version>
+		<jbehave.web.selenium.version>3.3.4</jbehave.web.selenium.version>
+		<selenium.maven.plugin.version>1.1</selenium.maven.plugin.version>
+	</properties>
+
+	<dependencies>
+		<!-- BG-JUG Projects Dependencies -->
+		<dependency>
+			<groupId>org.jug.bg.bdd</groupId>
+			<artifactId>domain</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+
+		<!-- Servlet API Dependencies -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JBehave Dependencies -->
+		<dependency>
+			<groupId>org.jbehave</groupId>
+			<artifactId>jbehave-maven-plugin</artifactId>
+			<version>${jbehave.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jbehave</groupId>
+			<artifactId>jbehave-core</artifactId>
+			<version>${jbehave.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jbehave.web</groupId>
+			<artifactId>jbehave-web-selenium</artifactId>
+			<version>${jbehave.web.selenium.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.doxia</groupId>
+			<artifactId>doxia-sink-api</artifactId>
+			<version>1.0-alpha-8</version>
+		</dependency>
+
+		<!-- Test Frameworks Dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<version>1.1</version>
+		</dependency>
+
+		<!-- Various Dependencies -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.5</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${war.file.name}</finalName>
+		<testOutputDirectory>target/classes</testOutputDirectory>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources/stories</directory>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources/i18n</directory>
+			</testResource>
+		</testResources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<warSourceDirectory>WebContent</warSourceDirectory>
+					<warSourceIncludes>META-INF/**,WEB-INF/**,jsp/**,*.jsp,*.txt</warSourceIncludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-jbehave-reports-resources</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<overwriteReleases>false</overwriteReleases>
+							<overwriteSnapshots>true</overwriteSnapshots>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.jbehave</groupId>
+									<artifactId>jbehave-core</artifactId>
+									<version>${jbehave.version}</version>
+									<outputDirectory>${project.build.directory}/jbehave/view</outputDirectory>
+									<includes>**\/*.css,**\/*.ftl,**\/*.js</includes>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
