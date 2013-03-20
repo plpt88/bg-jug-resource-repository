@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jms="http://www.springframework.org/schema/integration/jms"
+	xmlns:stream="http://www.springframework.org/schema/integration/stream"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/integration
+            http://www.springframework.org/schema/integration/spring-integration.xsd
+            http://www.springframework.org/schema/integration/jms
+            http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+            http://www.springframework.org/schema/integration/stream
+            http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd">
+
+	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
+	<bean id="manufacturer" class="edu.integration.patterns.manufacturer.NikeImpl" />
+
+	<int:gateway id="tradeGateway" default-request-channel="orderChannel"
+		service-interface="edu.integration.patterns.service.ProducersService" />
+
+	<int:channel id="orderChannel" />
+
+	<jms:outbound-channel-adapter id="jmsout"
+		destination="requestQueue" channel="orderChannel" />
+
+	<jms:message-driven-channel-adapter
+		id="jmsin" destination="requestQueue" channel="jmsToNike" />
+
+	<int:channel id="jmsToNike" />
+
+	<int:service-activator id="nikeActivator"
+		input-channel="jmsToNike" ref="manufacturer" method="receiveOrder" />
+
+	<!-- JMS common settings -->
+	<bean id="connectionFactory"
+		class="org.springframework.jms.connection.CachingConnectionFactory">
+		<property name="targetConnectionFactory">
+			<bean class="org.apache.activemq.ActiveMQConnectionFactory">
+				<property name="brokerURL" value="tcp://localhost:61616" />
+			</bean>
+		</property>
+		<property name="sessionCacheSize" value="10" />
+		<property name="cacheProducers" value="false" />
+	</bean>
+
+	<bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="queue.demo" />
+	</bean>
+
+</beans>
